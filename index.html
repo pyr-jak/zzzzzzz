@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12111b">
+  <title>Fiszki · Polski → angielski</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+      --background: #12111b;
+      --panel: #1c1a29;
+      --border: #3b374c;
+      --text: #f7f4ff;
+      --muted: #b9b2cd;
+      --accent: #c8b8ff;
+      --gold: #ffd881;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: radial-gradient(ellipse at 50% 0%, #231e35, transparent 40rem) var(--background);
+    }
+
+    button, select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button { cursor: pointer; }
+
+    button:focus-visible, select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    main {
+      width: min(48rem, calc(100% - 2.5rem));
+      margin-inline: auto;
+      padding-block: clamp(2rem, 8vh, 5rem) 3rem;
+    }
+
+    header, .brand, .controls, .position, .navigation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    header {
+      padding-bottom: 1.65rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand { gap: .85rem; }
+
+    .brand-mark {
+      position: relative;
+      width: 2.8rem;
+      height: 2.8rem;
+      border: 1px solid #655588;
+      border-radius: .85rem;
+      background: #332849;
+    }
+
+    .brand-mark::before, .brand-mark::after {
+      position: absolute;
+      width: .92rem;
+      height: 1.15rem;
+      border: 1.5px solid var(--accent);
+      border-radius: .2rem;
+      content: "";
+    }
+
+    .brand-mark::before {
+      top: .69rem;
+      left: .83rem;
+      transform: rotate(-17deg);
+    }
+
+    .brand-mark::after {
+      top: .79rem;
+      left: 1rem;
+      background: #53436f;
+      transform: rotate(12deg);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 5vw, 2.5rem);
+      line-height: 1;
+      letter-spacing: -.045em;
+    }
+
+    .direction, .position {
+      color: var(--muted);
+      font-size: .875rem;
+      font-weight: 550;
+    }
+
+    .direction { margin: 0; text-align: right; }
+    .direction span { color: var(--accent); }
+
+    .controls {
+      align-items: end;
+      margin-block: 1.6rem 1.9rem;
+    }
+
+    .category {
+      display: grid;
+      gap: .45rem;
+      width: min(100%, 18rem);
+      min-width: 0;
+      color: var(--muted);
+      font-size: .875rem;
+      font-weight: 550;
+    }
+
+    select {
+      width: 100%;
+      min-height: 2.875rem;
+      padding: .55rem .75rem;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: .65rem;
+      cursor: pointer;
+    }
+
+    .views {
+      display: flex;
+      gap: .18rem;
+      padding: .22rem;
+      background: #161420;
+      border: 1px solid var(--border);
+      border-radius: .75rem;
+    }
+
+    .views button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      min-height: 2.35rem;
+      padding: .35rem .75rem;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: .5rem;
+      font-size: .875rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .views button:hover { color: var(--text); }
+
+    .views button[aria-pressed="true"] {
+      color: var(--text);
+      background: #342a4b;
+      border-color: #56466f;
+    }
+
+    .count {
+      min-width: 1.4rem;
+      padding: .08rem .3rem;
+      color: var(--gold);
+      background: #34303c;
+      border-radius: .35rem;
+      font-size: .75rem;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+    }
+
+    .position {
+      align-items: baseline;
+      margin-bottom: .55rem;
+    }
+
+    #counter { color: var(--text); }
+    #current-category { text-align: right; }
+
+    progress {
+      display: block;
+      width: 100%;
+      height: .25rem;
+      overflow: hidden;
+      appearance: none;
+      background: #332d43;
+      border: 0;
+      border-radius: 1rem;
+    }
+
+    progress::-webkit-progress-bar { background: #332d43; }
+    progress::-webkit-progress-value { background: var(--accent); border-radius: 1rem; }
+    progress::-moz-progress-bar { background: var(--accent); border-radius: 1rem; }
+
+    .stage { position: relative; }
+    .stage, .empty { margin-top: 1.05rem; }
+
+    .card, .empty {
+      width: 100%;
+      min-height: 21.5rem;
+      padding: 1.25rem clamp(1rem, 4vw, 2rem);
+      border: 1px solid #494059;
+      border-radius: 1.35rem;
+      background: radial-gradient(ellipse at 50% 0%, #272137, #1d1a2a 76%);
+      box-shadow: 0 1rem 2.5rem #0b091546;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: border-color .15s ease, background-color .15s ease;
+    }
+
+    .card:hover, .card[data-revealed="true"] { border-color: #8a74b6; }
+
+    .side {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      min-height: 2.8rem;
+      color: var(--accent);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .card-content {
+      display: grid;
+      gap: .75rem;
+      width: 100%;
+      margin-block: auto;
+      padding-block: 1.35rem;
+      overflow-wrap: anywhere;
+    }
+
+    #word {
+      font-size: clamp(1.8rem, 5.5vw, 3.3rem);
+      line-height: 1.12;
+      letter-spacing: -.032em;
+      font-weight: 720;
+      text-wrap: balance;
+    }
+
+    .card[data-revealed="true"] #word { color: var(--accent); }
+
+    #note {
+      max-width: 31rem;
+      margin-inline: auto;
+      color: var(--muted);
+      font-size: clamp(.9rem, 2.8vw, 1.05rem);
+      line-height: 1.5;
+    }
+
+    .card-action {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      color: var(--muted);
+      min-height: 2.15rem;
+      font-size: .875rem;
+    }
+
+    .card-action span:first-child { color: var(--accent); font-size: 1.15rem; }
+
+    .star {
+      position: absolute;
+      top: 1.25rem;
+      right: clamp(1rem, 4vw, 2rem);
+      display: grid;
+      place-items: center;
+      width: 2.8rem;
+      height: 2.8rem;
+      padding: 0;
+      color: var(--muted);
+      background: #211d2f;
+      border: 1px solid #4f435f;
+      border-radius: .75rem;
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .star:hover, .star[aria-pressed="true"] {
+      color: var(--gold);
+      border-color: #8c754f;
+    }
+
+    .star[aria-pressed="true"] { background: #3b302b; }
+
+    .navigation { margin-top: 1.15rem; }
+
+    .nav-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: .55rem;
+      min-height: 3rem;
+      padding: .55rem 1.05rem;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: .7rem;
+      font-size: .94rem;
+      font-weight: 650;
+    }
+
+    .nav-button:hover:enabled { background: #2c253c; }
+    .nav-button:disabled { opacity: .48; cursor: default; }
+
+    .primary {
+      color: #21183a;
+      background: var(--accent);
+      border-color: transparent;
+    }
+
+    .primary:hover:enabled { background: #ded3ff; }
+
+    .empty {
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: .8rem;
+      text-align: center;
+    }
+
+    .empty > span { color: var(--gold); font-size: 2rem; line-height: 1; }
+    .empty h2, .empty p { margin: 0; }
+    .empty p, .storage-note { color: var(--muted); }
+    .empty button { margin-top: .35rem; }
+    .storage-note { margin: .9rem 0 0; font-size: .85rem; line-height: 1.45; }
+    .storage-note:empty { margin: 0; }
+
+    @media (max-width: 36rem) {
+      main { width: calc(100% - 2rem); }
+      .controls { align-items: stretch; flex-direction: column; gap: .8rem; }
+      .category { width: 100%; }
+      .views button { flex: 1; }
+      .card, .empty { min-height: 18.5rem; }
+      .nav-button { padding-inline: .75rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <h1>Fiszki</h1>
+      </div>
+      <p class="direction">Polski <span aria-hidden="true">→</span> angielski</p>
+    </header>
+
+    <div class="controls">
+      <label class="category" for="category">
+        Dział
+        <select id="category">
+          <option value="all">Wszystkie działy</option>
+        </select>
+      </label>
+
+      <div class="views" role="group" aria-label="Widok fiszek">
+        <button id="all-cards" type="button" aria-pressed="true">Wszystkie</button>
+        <button id="starred-cards" type="button" aria-pressed="false">
+          Z gwiazdką <span class="count" id="star-count">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="progress-area">
+      <div class="position">
+        <span id="counter" aria-live="polite"></span>
+        <span id="current-category"></span>
+      </div>
+      <progress id="progress" aria-label="Pozycja w zestawie" max="1" value="0"></progress>
+    </div>
+
+    <div class="stage" id="stage">
+      <button class="card" id="card" type="button" data-revealed="false">
+        <span class="side" id="side">Polski</span>
+        <span class="card-content" aria-live="polite" aria-atomic="true">
+          <span id="word"></span>
+          <span id="note" hidden></span>
+        </span>
+        <span class="card-action">
+          <span aria-hidden="true">↻</span>
+          <span id="card-action">Odsłoń odpowiedź</span>
+        </span>
+      </button>
+      <button class="star" id="star" type="button" aria-pressed="false" aria-label="Oznacz fiszkę gwiazdką" title="Dodaj gwiazdkę">
+        <span aria-hidden="true">☆</span>
+      </button>
+    </div>
+
+    <div class="empty" id="empty" hidden>
+      <span aria-hidden="true">☆</span>
+      <h2>Brak fiszek z gwiazdką</h2>
+      <p>Oznacz fiszkę gwiazdką, żeby wrócić do niej w tym widoku.</p>
+      <button class="nav-button primary" id="show-all" type="button">Pokaż wszystkie</button>
+    </div>
+
+    <nav class="navigation" id="navigation" aria-label="Nawigacja między fiszkami">
+      <button class="nav-button" id="previous" type="button">
+        <span aria-hidden="true">←</span> Poprzednia
+      </button>
+      <button class="nav-button primary" id="next" type="button">
+        <span id="next-label">Następna</span> <span aria-hidden="true">→</span>
+      </button>
+    </nav>
+
+    <p class="storage-note" id="storage-note" role="status"></p>
+    <noscript>Włącz JavaScript w przeglądarce, aby korzystać z fiszek.</noscript>
+  </main>
+
+  <script>
+    // Każdy wiersz zawiera polski tekst, angielską odpowiedź i opcjonalne podpowiedzi.
+    const groups = [
+      {
+        name: "Ludzie mediów",
+        words: [
+          ["komentator", "commentator", "np. sportowy"],
+          ["krytyk", "critic", "np. filmowy, muzyczny"],
+          ["krytyk teatralny", "theatre critic"],
+          ["redaktor naczelny / wydawca", "editor"],
+          ["niezależny dziennikarz", "freelance journalist", "wolny strzelec"],
+          ["prezenter wiadomości", "newsreader"],
+          ["paparazzi", "paparazzi", "fotografowie śledzący sławne osoby"],
+          ["prezenter", "presenter", "radiowy lub telewizyjny"],
+          ["nadawca / prezenter radiowy lub telewizyjny", "broadcaster"],
+          ["fotoreporter", "press photographer"],
+          ["reporter", "reporter"]
+        ]
+      },
+      {
+        name: "Media i słownictwo",
+        words: [
+          ["reklama", "advertisement (advert / ad)"],
+          ["rysunek satyryczny / komiks", "cartoon"],
+          ["krzyżówka", "crossword (do crosswords)", "rozwiązywać krzyżówki"],
+          ["pierwsza strona", "front page", "okładka gazety"],
+          ["horoskop", "horoscope"],
+          ["recenzja", "review"],
+          ["ogłoszenia drobne", "small ads (classified ads)"],
+          ["prognoza pogody", "weather forecast"],
+          ["wiadomości", "news", "", "Rzeczownik niepoliczalny. Łączy się z liczbą pojedynczą, np. „The news is…”"],
+          ["nadawać, emitować / transmisja", "broadcast"],
+          ["ostatnie wydarzenia", "recent happenings"],
+          ["plotki o celebrytach", "celebrity gossip"],
+          ["w wiadomościach", "in the news", "temat, o którym jest głośno"],
+          ["wyniki sportowe", "sports results"],
+          ["co grają (w kinie) / repertuar", "what's on (at the cinema)"],
+          ["nagłówki wiadomości", "news headlines"],
+          ["sensacyjny, wyolbrzymiony, żądny sensacji", "sensational"],
+          ["stronniczy, nieobiektywny", "biased"],
+          ["obiektywny, bezstronny", "objective"],
+          ["dokładny, rzetelny, zgodny z prawdą", "accurate"],
+          ["rzetelny, wiarygodny", "reliable"],
+          ["ocenzurowany", "censored"]
+        ]
+      },
+      {
+        name: "Nagłówki prasowe",
+        words: [
+          ["kłótnia, awantura", "row", "", "argument"],
+          ["zrezygnować, odejść ze stanowiska", "to quit", "", "is going to leave"],
+          ["zredukowane, obcięte, zlikwidowane", "axed", "", "have been cut"],
+          ["dotknięty czymś, poszkodowany przez coś", "hit by", "", "has been badly affected"],
+          ["poślubić, wziąć ślub", "to wed", "", "is going to marry"],
+          ["przesłuchiwać, wypytywać", "quiz", "", "question, interrogate"],
+          ["popiera, wspiera", "backs", "", "supports"],
+          ["typowany do zwycięstwa/sukcesu", "tipped (for)", "", "is predicted to be successful"]
+        ]
+      },
+      {
+        name: "Sen",
+        words: [
+          ["czuć się sennym", "feel sleepy"],
+          ["ziewać", "yawn"],
+          ["nastawić budzik", "set an alarm clock"],
+          ["poduszka", "pillow"],
+          ["kołdra", "duvet"],
+          ["prześcieradła", "sheets"],
+          ["koce", "blankets"],
+          ["zasnąć", "fall asleep"],
+          ["chrapać", "snore"],
+          ["sny", "dreams"],
+          ["koszmary senne", "nightmares"],
+          ["zaspać", "oversleep"],
+          ["nie dawać komuś zasnąć / utrzymywać w stanie czuwania", "keep someone awake"],
+          ["bezsenność", "insomnia"],
+          ["tabletki nasenne", "sleeping tablets"],
+          ["drzemka", "nap (have a nap)", "zdrzemnąć się"],
+          ["sjesta", "siesta", "poobiedni odpoczynek"],
+          ["spać jak zabity / jak suseł", "sleep like a log"],
+          ["zmęczony po zmianie strefy czasowej", "jet-lagged", "z jet lagiem"],
+          ["w ogóle nie spać, nie zmrużyć oka", "not get any sleep (at all)"],
+          ["przykryć się", "cover oneself up"],
+          ["oddychać", "breathe"],
+          ["cierpieć na (bezsenność)", "suffer from (insomnia)"],
+          ["strefa czasowa", "time zone"]
+        ]
+      },
+      {
+        name: "Muzyka, teatr i kultura",
+        words: [
+          ["sztuka teatralna", "play"],
+          ["producent", "producer"],
+          ["występ, przedstawienie", "performance"],
+          ["impresario, organizator koncertów lub spektakli", "impresario"],
+          ["sala koncertowa", "concert hall"],
+          ["karnety, bilety sezonowe", "season tickets", "tańsze niż pojedyncze bilety"],
+          ["kompozytor", "composer"],
+          ["requiem", "requiem", "utwór muzyczny skomponowany dla niedawno zmarłej osoby"],
+          ["dyrygent", "conductor"],
+          ["fanfara", "fanfare", "krótki, głośny utwór grany dla uczczenia czegoś ważnego"],
+          ["fagot", "bassoon"],
+          ["instrument dęty", "wind instrument"],
+          ["dyrektor muzyczny", "musical director"],
+          ["parter", "the stalls", "miejsca siedzące na parterze w teatrze lub sali koncertowej"],
+          ["publiczność, widownia", "audience"],
+          ["skrzypek", "violinist", "", "violin – skrzypce"],
+          ["perkusista", "drummer", "", "drums – perkusja"],
+          ["solista", "soloist"],
+          ["gitarzysta", "guitarist"],
+          ["orkiestra", "orchestra"],
+          ["chór", "choir"],
+          ["instrument klawiszowy / klawiatura", "keyboard"],
+          ["chwytliwy, wpadający w ucho", "catchy", "np. piosenka"],
+          ["tekst piosenki", "lyrics"],
+          ["melodia", "tune"]
+        ]
+      },
+      {
+        name: "Zwroty i kolokacje",
+        words: [
+          ["być odpowiedzialnym za, kierować czymś", "to be in charge of"],
+          ["mieć wpływ na", "have an impact on"],
+          ["zaprzyjaźnić się z", "make friends with"],
+          ["od razu, natychmiast", "straight away"],
+          ["zostać wydrukowanym", "get printed"],
+          ["zostać wyciętym", "get cut"],
+          ["dawno temu, jeszcze (w 1895 r.)", "way back (in 1895)"],
+          ["przechadzać się, chodzić bez celu", "wander around"],
+          ["przypadkiem, przez przypadek", "by chance"],
+          ["jak się okazało", "as it turned out"],
+          ["tak się składa, że / akurat", "as it happens"],
+          ["relaksować się, wyluzować", "chill out"],
+          ["spędzać czas, przesiadywać, kręcić się gdzieś", "hang out / hang around"],
+          ["całkiem sporo, niemało", "quite a few"],
+          ["nie mieć pojęcia", "have no idea"],
+          ["zajmować wieki / bardzo dużo czasu", "take ages"]
+        ]
+      },
+      {
+        name: "Mini grammar",
+        words: [
+          ["przyzwyczaić się do (robienia czegoś)", "get used to (doing sth)"],
+          ["kiedyś coś robić", "used to (do sth)", "w przeszłości"],
+          ["doradzać (komuś zrobienie czegoś)", "advise (sb to do sth)"],
+          ["zaprzeczać (zrobieniu czegoś)", "deny (doing sth)"],
+          ["przepraszać za (zrobienie czegoś)", "apologize for (doing sth)"],
+          ["zdołać, dać radę (coś zrobić)", "manage to (do sth)"],
+          ["wymagać czyszczenia", "need cleaning", "", "W tej konstrukcji po „need” występuje czasownik z końcówką -ing."]
+        ]
+      },
+      {
+        name: "Pozostałe słówka",
+        words: [
+          ["faworyzować", "to favour"],
+          ["fabuła", "plot"],
+          ["proces sądowy", "trial"],
+          ["świadek", "witness"],
+          ["przygnębiający, dołujący", "depressing"],
+          ["dowiedzieć się", "find out"],
+          ["trwający, ciągły", "ongoing"],
+          ["ostateczny termin", "deadline", "np. oddania tekstu"],
+          ["fragmenty, urywki", "bits"],
+          ["akapit", "paragraph"],
+          ["zauważyć", "notice"],
+          ["najwyraźniej, podobno", "apparently"],
+          ["stopniowo", "gradually"],
+          ["oczywiście", "obviously"],
+          ["szkodliwy", "harmful"],
+          ["narzekać na", "complain about"],
+          ["wart powiedzenia", "worth saying"],
+          ["krytykować", "criticize"],
+          ["pozwolenie, zgoda", "permission"],
+          ["okazja, sposobność", "opportunity"],
+          ["nieprzewidywalność", "unpredictability"],
+          ["monotonny", "monotonous"],
+          ["przerażający", "frightening"],
+          ["organizować (sztuki/koncerty)", "arrange (plays/concerts)"],
+          ["uczęszczać, brać udział", "attend", "np. w koncercie"],
+          ["pogrzeb", "funeral"],
+          ["namiot", "tent"],
+          ["prawnik", "lawyer"],
+          ["myjnia samochodowa", "car wash"],
+          ["szeptać / szept", "whisper"],
+          ["gwizdać / gwizdek", "whistle"],
+          ["cały", "whole"],
+          ["przekonać", "convince"],
+          ["przyznać (się)", "admit"],
+          ["zgadzać się", "agree"],
+          ["odmawiać", "refuse"]
+        ]
+      }
+    ];
+
+    const get = (id) => document.getElementById(id);
+    const category = get("category");
+    const allButton = get("all-cards");
+    const starredButton = get("starred-cards");
+    const cardButton = get("card");
+    const starButton = get("star");
+    const previous = get("previous");
+    const next = get("next");
+    const empty = get("empty");
+    const showAll = get("show-all");
+    const storageNote = get("storage-note");
+    const progress = get("progress");
+    const storagePrefix = "fiszki-pl-en:gwiazdka:";
+
+    const cards = groups.flatMap(({ name, words }, index) => {
+      const groupId = String(index);
+      category.add(new Option(name, groupId));
+      return words.map(([pl, en, plNote, answerNote]) => ({
+        pl, en, plNote, answerNote, groupId, categoryName: name
+      }));
+    });
+
+    const stars = loadStars();
+    let onlyStarred = false;
+    let current = 0;
+    let revealed = false;
+    let activeCards = cards;
+
+    function loadStars() {
+      try {
+        return new Set(cards.filter(({ en }) => localStorage.getItem(storagePrefix + en) === "1").map(({ en }) => en));
+      } catch {
+        return new Set();
+      }
+    }
+
+    function cardsInCategory() {
+      return category.value === "all" ? cards : cards.filter(({ groupId }) => groupId === category.value);
+    }
+
+    function renderCard() {
+      const card = activeCards[current];
+      const word = get("word");
+      const note = get("note");
+      const saved = stars.has(card.en);
+
+      cardButton.dataset.revealed = String(revealed);
+      get("side").textContent = revealed ? "Angielski" : "Polski";
+      word.lang = revealed ? "en" : "pl";
+      word.textContent = revealed ? card.en : card.pl;
+      note.textContent = (revealed ? card.answerNote : card.plNote) || "";
+      note.hidden = !note.textContent;
+      get("card-action").textContent = revealed ? "Wróć do polskiego" : "Odsłoń odpowiedź";
+      starButton.setAttribute("aria-pressed", String(saved));
+      starButton.firstElementChild.textContent = saved ? "★" : "☆";
+      starButton.title = saved ? "Usuń gwiazdkę" : "Dodaj gwiazdkę";
+    }
+
+    function render() {
+      allButton.setAttribute("aria-pressed", String(!onlyStarred));
+      starredButton.setAttribute("aria-pressed", String(onlyStarred));
+      get("star-count").textContent = cardsInCategory().filter(({ en }) => stars.has(en)).length;
+
+      const total = activeCards.length;
+      const isEmpty = total === 0;
+      get("progress-area").hidden = isEmpty;
+      get("stage").hidden = isEmpty;
+      get("navigation").hidden = isEmpty;
+      empty.hidden = !isEmpty;
+      if (isEmpty) return;
+
+      get("counter").textContent = "Fiszka " + (current + 1) + " z " + total;
+      get("current-category").textContent = activeCards[current].categoryName;
+      progress.max = total;
+      progress.value = current + 1;
+      previous.disabled = current === 0;
+      next.disabled = total === 1;
+      get("next-label").textContent = total > 1 && current === total - 1 ? "Od początku" : "Następna";
+      renderCard();
+    }
+
+    function selectDeck(starred, keepCard = true) {
+      const previousCard = activeCards[current];
+      onlyStarred = starred;
+      const selected = cardsInCategory();
+      activeCards = starred ? selected.filter(({ en }) => stars.has(en)) : selected;
+      current = keepCard ? Math.max(0, activeCards.indexOf(previousCard)) : 0;
+      revealed = false;
+      render();
+    }
+
+    function toggleStar() {
+      const { en } = activeCards[current];
+      const removing = stars.has(en);
+      if (removing) stars.delete(en);
+      else stars.add(en);
+
+      try {
+        if (removing) localStorage.removeItem(storagePrefix + en);
+        else localStorage.setItem(storagePrefix + en, "1");
+        storageNote.textContent = "";
+      } catch {
+        storageNote.textContent = "Przeglądarka blokuje zapis. Zmiana gwiazdki jest widoczna do zamknięcia strony.";
+      }
+
+      if (onlyStarred && removing) {
+        activeCards = activeCards.filter((card) => card.en !== en);
+        current = Math.max(0, Math.min(current, activeCards.length - 1));
+        revealed = false;
+      }
+
+      render();
+      if (activeCards.length === 0) showAll.focus();
+    }
+
+    function moveTo(index) {
+      if (index < 0 || index >= activeCards.length || index === current) return;
+      current = index;
+      revealed = false;
+      render();
+    }
+
+    category.addEventListener("change", () => selectDeck(onlyStarred, false));
+    allButton.addEventListener("click", () => selectDeck(false));
+    starredButton.addEventListener("click", () => selectDeck(true));
+    showAll.addEventListener("click", () => {
+      selectDeck(false);
+      cardButton.focus();
+    });
+
+    cardButton.addEventListener("click", () => {
+      revealed = !revealed;
+      renderCard();
+    });
+    starButton.addEventListener("click", toggleStar);
+    previous.addEventListener("click", () => moveTo(current - 1));
+    next.addEventListener("click", () => moveTo((current + 1) % activeCards.length));
+
+    document.addEventListener("keydown", (event) => {
+      if (event.target === category || event.altKey || event.ctrlKey || event.metaKey || activeCards.length < 2) return;
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        previous.click();
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        next.click();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
